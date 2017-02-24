@@ -71,6 +71,26 @@ $result = Webhose::query("filterWebData", $params);
 print_filterwebdata_titles($result);
 ```
 
+You can traverse the structure as you would any PHP array:
+
+```php
+//Print more detailed information about the article:
+
+$params = array("q"=>"United States", "size"=>"1");
+$result = Webhose::query("filterWebData", $params);
+
+foreach($result->posts as $post)
+{
+    echo "<p>Site: <b>" . $post->thread->site . "</b></p>";
+    echo "<p>Categories:</p>";
+    echo "<ul>";
+    foreach($post->thread->site_categories as $category) {
+        echo "<li>" . $category . "</li>";
+    }
+    echo "</ul>";
+}
+```
+
 <br />
 
 Depending on the endpoint used, the resulting JSON array could provide "posts", "products", ...
@@ -103,3 +123,26 @@ Full documentation
 * ``Webhose::enable_debug(debug_enabled)``
 
   * debug_enabled - boolean, If true, echoes the parameterised Webhose API URL before executing requests.
+
+
+Polling
+------------------
+
+It is possible to continue a search to fetch more results using the same parameters:
+
+```php
+//Perform a "productSearch" query using "United Kingdom" as our keywords.
+$params = array("q"=>"United Kingdom", "size"=>"1");
+$result = Webhose::query("productSearch", $params);
+print_productsearch_titles($result);
+
+//Fetch the next results using the same terms.
+$result = Webhose::get_next();
+print_productsearch_titles($result);
+
+$result = Webhose::get_next();
+print_productsearch_titles($result);
+
+//...
+//When $result is null, there are no more results available.
+```
